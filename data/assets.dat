@@ -1,0 +1,17 @@
+Texture TexBoulder gfx/boulder1.png
+Texture TexBush gfx/bush1.png
+Texture TexPlayerStandingUp gfx/player_standing_u.png
+Texture TexPlayerStandingDown gfx/player_standing_d.png
+Texture TexPlayerStandingHoriz gfx/player_standing_r.png
+Texture TexPlayerMovingUp gfx/player_moving_u.png
+Texture TexPlayerMovingDown gfx/player_moving_d.png
+Texture TexPlayerMovingHoriz gfx/player_moving_r.png
+Animation Boulder TexBoulder 1 0
+Animation Bush TexBush 1 0
+Animation PlayerStandingUp TexPlayerStandingUp 1 0
+Animation PlayerStandingDown TexPlayerStandingDown 1 0
+Animation PlayerStandingHoriz TexPlayerStandingHoriz 1 0
+Animation PlayerMovingUp TexPlayerMovingUp 2 15
+Animation PlayerMovingDown TexPlayerMovingDown 2 15
+Animation PlayerMovingHoriz TexPlayerMovingHoriz 2 15
+Font MenuFont fonts/menu_font.ttf

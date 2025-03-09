@@ -1,0 +1,67 @@
+Assets def file:
+
+Texture N P
+	
+	N = name std::string
+	P = path std::string
+
+Animation N T F S
+
+	N = name
+	T = texture	std::string	- name define in Texture (see above)
+	F = frame count	int
+	S = speed	int		- number of game frames between animation frames
+
+Font N P
+
+	N = name	std::string
+	P = path	std::string
+
+Sound N P
+
+	N = name	std::string
+	P = path	std::string
+
+---
+
+Level specification:
+
+Player X Y BX BY S H
+
+	X, Y	int, int	= spawn position
+	BC, BY	int, int	= bounding box
+	S	float		= speed
+	H	int		= max health
+
+Tile Name RX RY TX TY BM BV
+
+	Name	std::string	= corresponding animation name
+	RX, RY	int, int	= room coords
+	TX, TY	int, int	= tile pos (in room)
+	BM	int		= blocks movement (1 = true, 0 = false)
+	BV	int		= blocks vision (--//--)
+
+NPC Name RX RY TX TY BM BV H D AI ...
+
+	Name	std::string	= corresponding animation name
+	RX, RY	int, int	= room coords
+	TX, TY	int, int	= tile pos (in room)
+	BM	int		= blocks movement (1 = true, 0 = false)
+	BV	int		= blocks vision (--//--)
+	H	int		= max health
+	D	int		= damage (to player)
+	AI	std::string	= AI behaviour name
+	...	(see below)	= AI behaviour parameters
+
+AI:
+
+Follow S
+
+	S	float		= speed
+
+Patrol S N X1 Y2 X2 Y2 ... Nn Yn
+
+	S	float		= speed
+	N	int		= number of positions
+	Xi, Yi	int, int	= tile pos of patrol pos i
+
