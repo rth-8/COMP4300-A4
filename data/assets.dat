@@ -6,6 +6,15 @@ Texture TexPlayerStandingHoriz gfx/player_standing_r.png
 Texture TexPlayerMovingUp gfx/player_moving_u.png
 Texture TexPlayerMovingDown gfx/player_moving_d.png
 Texture TexPlayerMovingHoriz gfx/player_moving_r.png
+Texture TexWaterTL gfx/water1_000000.png
+Texture TexWaterTM gfx/water1_000001.png
+Texture TexWaterTR gfx/water1_000002.png
+Texture TexWaterML gfx/water1_000003.png
+Texture TexWaterMM gfx/water1_000004.png
+Texture TexWaterMR gfx/water1_000005.png
+Texture TexWaterBL gfx/water1_000006.png
+Texture TexWaterBM gfx/water1_000007.png
+Texture TexWaterBR gfx/water1_000008.png
 Animation Boulder TexBoulder 1 0
 Animation Bush TexBush 1 0
 Animation PlayerStandingUp TexPlayerStandingUp 1 0
@@ -14,4 +23,13 @@ Animation PlayerStandingHoriz TexPlayerStandingHoriz 1 0
 Animation PlayerMovingUp TexPlayerMovingUp 2 15
 Animation PlayerMovingDown TexPlayerMovingDown 2 15
 Animation PlayerMovingHoriz TexPlayerMovingHoriz 2 15
+Animation WaterTL TexWaterTL 1 0
+Animation WaterTM TexWaterTM 1 0
+Animation WaterTR TexWaterTR 1 0
+Animation WaterML TexWaterML 1 0
+Animation WaterMM TexWaterMM 1 0
+Animation WaterMR TexWaterMR 1 0
+Animation WaterBL TexWaterBL 1 0
+Animation WaterBM TexWaterBM 1 0
+Animation WaterBR TexWaterBR 1 0
 Font MenuFont fonts/menu_font.ttf

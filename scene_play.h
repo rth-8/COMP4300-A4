@@ -19,6 +19,10 @@ class ScenePlay : public Scene
     };
     
     sf::View view;
+    int windowW;
+    int windowW2;
+    int windowH;
+    int windowH2;
     
     std::string levelPath;
     

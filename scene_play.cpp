@@ -13,7 +13,14 @@ ScenePlay::ScenePlay(GameEngine* eng, const std::string & lvlP)
     , levelPath(lvlP)
 {
     // std::cout << "SCENE PLAY: c'tor\n";
+    
+    this->windowW = this->engine->getWindow()->getSize().x;
+    this->windowW2 = this->engine->getWindow()->getSize().x / 2;
+    this->windowH = this->engine->getWindow()->getSize().y;
+    this->windowH2 = this->engine->getWindow()->getSize().y / 2;
+
     this->view = this->engine->getWindow()->getDefaultView();
+    
     init();
 }
 
@@ -55,52 +62,41 @@ void ScenePlay::load_level()
 
             std::stringstream ss(line);
             std::string token;
-
-            // std::string sval1;
-            // std::string sval2;
-            int ival1;
-            int ival2;
-
+            
             if (std::getline(ss, token, ' '))
             {
                 if (token == "Tile")
                 {
-                    // ss >> sval1 >> ival1 >> ival2;
+                    std::string animName;
+                    int roomX, roomY;
+                    int tileX, tileY;
+                    int blockM, blockV;
                     
-                    // if (ival1 > maxCol)
-                        // maxCol = ival1;
+                    ss >> animName >> roomX >> roomY >> tileX >> tileY >> blockM >> blockV;
+                    // std::cout << "TILE: " << animName << ", [" << roomX << "," << roomY << "], [" << tileX << "," << tileY << "], " << blockM << "," << blockV << "\n";
                     
-                    // auto e = manager->addEntity("Tile");
-                    // auto& a = e->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation(sval1));
-                    // auto& t = e->addComponent<CTransform>();
-                    // t.pos.x = (ival1 * 64) + a.getAnimation()->getSize().x/2;
-                    // t.pos.y = bottom - (ival2 * 64) - a.getAnimation()->getSize().y/2;
-                    // e->addComponent<CBoundingBox>(a.getAnimation()->getSize());
-                }
-                else
-                if (token == "Dec")
-                {
-                    // ss >> sval1 >> ival1 >> ival2;
-                    
-                    // if (ival1 > maxCol)
-                        // maxCol = ival1;
-                    
-                    // auto e = manager->addEntity("Dec");
-                    // auto& a = e->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation(sval1));
-                    // auto& t = e->addComponent<CTransform>();
-                    // t.pos.x = (ival1 * 64) + a.getAnimation()->getSize().x/2;
-                    // t.pos.y = bottom - (ival2 * 64) - a.getAnimation()->getSize().y/2;
+                    auto e = manager->addEntity("Tile");
+                    auto& a = e->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation(animName));
+                    auto& bb = e->addComponent<CBoundingBox>(a.getAnimation()->getSize(), blockM, blockV);
+                    e->addComponent<CTransform>(Vec2(
+                        tileX + (roomX * this->windowW) + bb.halfSize.x, 
+                        tileY + (roomY * this->windowH) + bb.halfSize.y)
+                    );
+                    // std::cout << "pos: " << e->getComponent<CTransform>().pos.x << "," << e->getComponent<CTransform>().pos.y << "\n";
                 }
                 else
                 if (token == "Player")
                 {
-                    ss >> playerCfg.spawn_x >> playerCfg.spawn_y >> ival1 >> ival2 >> playerCfg.speed;
+                    int bbX;
+                    int bbY;
+            
+                    ss >> playerCfg.spawn_x >> playerCfg.spawn_y >> bbX >> bbY >> playerCfg.speed;
                     // create player entity
                     this->player = manager->addEntity("Player");
                     this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"));
                     this->player->addComponent<CTransform>(Vec2(playerCfg.spawn_x, playerCfg.spawn_y));
                     this->player->addComponent<CInput>();
-                    this->player->addComponent<CBoundingBox>(Vec2(ival1, ival2));
+                    this->player->addComponent<CBoundingBox>(Vec2(bbX, bbY), 1, 1);
                 }
             }
         }
@@ -124,7 +120,11 @@ void ScenePlay::update()
     if (this->isPaused == false)
     {
         currentFrame++;
-        this->engine->getWindow()->setTitle(std::format("frame: {}", currentFrame));
+        this->engine->getWindow()->setTitle(
+            std::format("({},{}), frame: {}", 
+            this->player->getComponent<CTransform>().pos.x,
+            this->player->getComponent<CTransform>().pos.y,
+            currentFrame));
     }
 }
 
@@ -156,57 +156,88 @@ void ScenePlay::sMovement()
         // apply speed
         trans.pos += trans.speed;
     }
+    
+    if (this->player->getComponent<CTransform>().pos.x < (this->view.getCenter().x - windowW2))
+        this->view.setCenter(sf::Vector2f(this->view.getCenter().x - this->engine->getWindow()->getSize().x, this->view.getCenter().y));
+
+    if (this->player->getComponent<CTransform>().pos.x > (this->view.getCenter().x + windowW2))
+        this->view.setCenter(sf::Vector2f(this->view.getCenter().x + this->engine->getWindow()->getSize().x, this->view.getCenter().y));
+    
+    if (this->player->getComponent<CTransform>().pos.y < (this->view.getCenter().y - windowH2))
+        this->view.setCenter(sf::Vector2f(this->view.getCenter().x, this->view.getCenter().y - this->engine->getWindow()->getSize().y));
+    
+    if (this->player->getComponent<CTransform>().pos.y > (this->view.getCenter().y + windowH2))
+        this->view.setCenter(sf::Vector2f(this->view.getCenter().x, this->view.getCenter().y + this->engine->getWindow()->getSize().y));
 }
 
 void ScenePlay::sEnemySpawner()
 {
 }
 
-// static bool checkCollision(std::shared_ptr<Entity> moving, std::shared_ptr<Entity> still, Vec2& vec)
-// {
-    // auto& movingTrans = moving->getComponent<CTransform>();
-    // auto& movingBB = moving->getComponent<CBoundingBox>();
+static bool checkCollision(std::shared_ptr<Entity> moving, std::shared_ptr<Entity> still, Vec2& vec)
+{
+    auto& movingTrans = moving->getComponent<CTransform>();
+    auto& movingBB = moving->getComponent<CBoundingBox>();
     
-    // auto& stillTrans = still->getComponent<CTransform>();
-    // auto& stillBB = still->getComponent<CBoundingBox>();
+    auto& stillTrans = still->getComponent<CTransform>();
+    auto& stillBB = still->getComponent<CBoundingBox>();
     
-    // float pox = movingBB.halfSize.x + stillBB.halfSize.x - abs(movingTrans.prevPos.x - stillTrans.pos.x);
-    // float poy = movingBB.halfSize.y + stillBB.halfSize.y - abs(movingTrans.prevPos.y - stillTrans.pos.y);
+    float pox = movingBB.halfSize.x + stillBB.halfSize.x - abs(movingTrans.prevPos.x - stillTrans.pos.x);
+    float poy = movingBB.halfSize.y + stillBB.halfSize.y - abs(movingTrans.prevPos.y - stillTrans.pos.y);
 
-    // float ox = movingBB.halfSize.x + stillBB.halfSize.x - abs(movingTrans.pos.x - stillTrans.pos.x);
-    // float oy = movingBB.halfSize.y + stillBB.halfSize.y - abs(movingTrans.pos.y - stillTrans.pos.y);
+    float ox = movingBB.halfSize.x + stillBB.halfSize.x - abs(movingTrans.pos.x - stillTrans.pos.x);
+    float oy = movingBB.halfSize.y + stillBB.halfSize.y - abs(movingTrans.pos.y - stillTrans.pos.y);
 
-    // short state = 0;
-    // if (pox > 0 && poy <= 0) state = 1;
-    // else
-    // if (pox <= 0 && poy > 0) state = 2;
-    // else
-    // if (pox > 0 && poy > 0) state = 3;
+    short state = 0;
+    if (pox > 0 && poy <= 0) state = 1;
+    else
+    if (pox <= 0 && poy > 0) state = 2;
+    else
+    if (pox > 0 && poy > 0) state = 3;
 
-    // if (ox > 0 && oy > 0)
-    // {        
-        // if (state == 1)
-        // {
-            // // vertical            
-            // if (movingTrans.pos.y < stillTrans.pos.y) vec.y = -oy;
-            // if (movingTrans.pos.y > stillTrans.pos.y) vec.y = oy;
-        // }
-        // else
-        // if (state == 2 || state == 3)
-        // {
-            // // horizontal
-            // if (movingTrans.pos.x < stillTrans.pos.x) vec.x = -ox;
-            // if (movingTrans.pos.x > stillTrans.pos.x) vec.x = ox;
-        // }
+    if (ox > 0 && oy > 0)
+    {        
+        if (state == 1)
+        {
+            // vertical            
+            if (movingTrans.pos.y < stillTrans.pos.y) vec.y = -oy;
+            if (movingTrans.pos.y > stillTrans.pos.y) vec.y = oy;
+        }
+        else
+        if (state == 2 || state == 3)
+        {
+            // horizontal
+            if (movingTrans.pos.x < stillTrans.pos.x) vec.x = -ox;
+            if (movingTrans.pos.x > stillTrans.pos.x) vec.x = ox;
+        }
         
-        // return true;
-    // }
+        return true;
+    }
     
-    // return false;
-// }
+    return false;
+}
 
 void ScenePlay::sCollision()
 {
+    Vec2 cVec;
+    
+    for (auto e : this->manager->getEntities("Tile"))
+    {
+        if (e->isAlive() == false)
+            continue;
+
+        if (e->getComponent<CBoundingBox>().blocksMovement == 1)
+        {
+            cVec.x = 0;
+            cVec.y = 0;
+            
+            if (checkCollision(this->player, e, cVec))
+            {
+                // resolve collision for player entity
+                this->player->getComponent<CTransform>().pos += cVec;
+            }
+        }
+    }
 }
 
 static void drawPoint(sf::RenderWindow & window, float x, float y, int size)
@@ -233,7 +264,14 @@ static void drawBB(sf::RenderWindow & window, const CTransform& trans, const CBo
     rectangle.setPosition(sf::Vector2f(trans.pos.x - bb.halfSize.x, trans.pos.y - bb.halfSize.y));
     rectangle.setFillColor(sf::Color(0, 0, 0, 0));
     rectangle.setOutlineThickness(-1);
-    rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));
+    if (bb.blocksMovement == 1 && bb.blocksVision == 1)
+        rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));
+    else
+    if (bb.blocksMovement == 1 && bb.blocksVision == 0)
+        rectangle.setOutlineColor(sf::Color(0, 0, 255, 255));
+    else
+    if (bb.blocksMovement == 0 && bb.blocksVision == 1)
+        rectangle.setOutlineColor(sf::Color(255, 0, 0, 255));
     window.draw(rectangle);
 }
 
@@ -241,7 +279,7 @@ void ScenePlay::sRender()
 {
     auto w = this->engine->getWindow();
     w->clear(sf::Color(252,216,168));
-
+    
     w->setView(this->view);
 
     for (auto e : this->manager->getEntities())
@@ -266,7 +304,7 @@ void ScenePlay::sRender()
 
 void ScenePlay::sDoAction(const Action& action)
 {
-    std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
+    // std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
     
     if (action.type() == "START")
     {

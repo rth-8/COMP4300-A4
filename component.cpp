@@ -32,6 +32,6 @@ CBoundingBox::CBoundingBox()
 {
 }
 
-CBoundingBox::CBoundingBox(const Vec2& s) : size(s), halfSize(s.x/2, s.y/2)
+CBoundingBox::CBoundingBox(const Vec2& s, int bm, int bv) : size(s), halfSize(s.x/2, s.y/2), blocksMovement(bm), blocksVision(bv)
 {
 }

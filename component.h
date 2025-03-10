@@ -40,9 +40,11 @@ class CBoundingBox : public CComponent
 public:
     Vec2 size       = { 0.0, 0.0 };
     Vec2 halfSize   = { 0.0, 0.0 };
+    int blocksMovement = 0;
+    int blocksVision = 0;
     
     CBoundingBox();
-    CBoundingBox(const Vec2& s);
+    CBoundingBox(const Vec2& s, int bm, int bv);
 };
 
 class CLifeSpan : public CComponent
