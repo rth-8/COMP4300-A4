@@ -76,7 +76,7 @@ void ScenePlay::load_level()
                     // std::cout << "TILE: " << animName << ", [" << roomX << "," << roomY << "], [" << tileX << "," << tileY << "], " << blockM << "," << blockV << "\n";
                     
                     auto e = manager->addEntity("Tile");
-                    auto& a = e->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation(animName));
+                    auto& a = e->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation(animName), true);
                     auto& bb = e->addComponent<CBoundingBox>(a.getAnimation()->getSize(), blockM, blockV);
                     e->addComponent<CTransform>(Vec2(
                         tileX + (roomX * this->windowW) + bb.halfSize.x, 
@@ -93,7 +93,7 @@ void ScenePlay::load_level()
                     ss >> playerCfg.spawn_x >> playerCfg.spawn_y >> bbX >> bbY >> playerCfg.speed;
                     // create player entity
                     this->player = manager->addEntity("Player");
-                    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"));
+                    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"), true);
                     this->player->addComponent<CTransform>(Vec2(playerCfg.spawn_x, playerCfg.spawn_y));
                     this->player->addComponent<CInput>();
                     this->player->addComponent<CBoundingBox>(Vec2(bbX, bbY), 1, 1);
@@ -313,7 +313,7 @@ void ScenePlay::startMoving(std::string name)
 void ScenePlay::startUp()
 {
     this->player->getComponent<CInput>().up = true;
-    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingUp"));
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingUp"), true);
     this->player->getComponent<CTransform>().speed.y = -playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = 1;
 }
@@ -321,7 +321,7 @@ void ScenePlay::startUp()
 void ScenePlay::startDown()
 {
     this->player->getComponent<CInput>().down = true;
-    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingDown"));
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingDown"), true);
     this->player->getComponent<CTransform>().speed.y = playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = 1;
 }
@@ -329,7 +329,7 @@ void ScenePlay::startDown()
 void ScenePlay::startLeft()
 {
     this->player->getComponent<CInput>().left = true;
-    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"), true);
     this->player->getComponent<CTransform>().speed.x = -playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = -1;
 }
@@ -337,7 +337,7 @@ void ScenePlay::startLeft()
 void ScenePlay::startRight()
 {
     this->player->getComponent<CInput>().right = true;
-    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"), true);
     this->player->getComponent<CTransform>().speed.x = playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = 1;
 }
@@ -411,7 +411,7 @@ void ScenePlay::sDoAction(const Action& action)
                 waitingAction.clear();
 
             this->player->getComponent<CInput>().up = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingUp"));
+            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingUp"), true);
             this->player->getComponent<CTransform>().speed.y = 0;
             
             if (!waitingAction.empty())
@@ -427,7 +427,7 @@ void ScenePlay::sDoAction(const Action& action)
                 waitingAction.clear();
             
             this->player->getComponent<CInput>().down = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"));
+            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"), true);
             this->player->getComponent<CTransform>().speed.y = 0;
             
             if (!waitingAction.empty())
@@ -443,7 +443,7 @@ void ScenePlay::sDoAction(const Action& action)
                 waitingAction.clear();
             
             this->player->getComponent<CInput>().left = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"));
+            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"), true);
             this->player->getComponent<CTransform>().speed.x = 0;
             
             if (!waitingAction.empty())
@@ -459,7 +459,7 @@ void ScenePlay::sDoAction(const Action& action)
                 waitingAction.clear();
             
             this->player->getComponent<CInput>().right = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"));
+            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"), true);
             this->player->getComponent<CTransform>().speed.x = 0;
             
             if (!waitingAction.empty())

@@ -17,9 +17,10 @@ class CAnimation : public CComponent
 
 public:
     int frame;
+    bool repeat = false;
     
     CAnimation();
-    CAnimation(Animation* a);
+    CAnimation(Animation* a, bool rpt);
     Animation* getAnimation();
 };
 
@@ -49,6 +50,12 @@ public:
 
 class CLifeSpan : public CComponent
 {
+public:
+    int lifespan = 0;
+    int frameCreated = 0;
+    
+    CLifeSpan();
+    CLifeSpan(int duration, int frame);
 };
 
 class CInput : public CComponent
@@ -68,6 +75,55 @@ public:
 
 class CState : public CComponent
 {
+};
+
+class CDamage : public CComponent
+{
+public:
+    int damage = 1;
+    
+    CDamage();
+    CDamage(int dmg);
+};
+
+class CInvincibility : public CComponent
+{
+public:
+    int iFrames = 0;
+    
+    CInvincibility();
+    CInvincibility(int ifrm);
+};
+
+class CHealth : public CComponent
+{
+public:
+    int max = 0;
+    int current = 0;
+    
+    CHealth();
+    CHealth(int m, int c);
+};
+
+class CFollowPlayer : public CComponent
+{
+public:
+    Vec2 home = {0, 0};
+    float speed = 0;
+    
+    CFollowPlayer();
+    CFollowPlayer(Vec2& pos, float spd);
+};
+
+class CPatrol : public CComponent
+{
+public:
+    std::vector<Vec2> positions;
+    size_t currentPos = 0;
+    float speed = 0;
+    
+    CPatrol();
+    CPatrol(std::vector<Vec2>& pos, float spd);
 };
 
 #endif

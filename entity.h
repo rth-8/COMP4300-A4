@@ -13,7 +13,12 @@ typedef std::tuple<
     CLifeSpan,
     CInput,
     CGravity,
-    CState
+    CState,
+    CDamage,
+    CInvincibility,
+    CHealth,
+    CFollowPlayer,
+    CPatrol
 > ComponentTuple;
 
 class Entity
