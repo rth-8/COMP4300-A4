@@ -35,6 +35,14 @@ class ScenePlay : public Scene
     bool isPaused = false; 
     bool isDrawingBB = false; 
     
+    std::string waitingAction;
+    void startMoving(std::string name);
+    void startUp();
+    void startDown();
+    void startLeft();
+    void startRight();
+    bool isPlayerMoving();
+    
 public:
     ScenePlay() = delete;
     ScenePlay(GameEngine* eng, const std::string & lvlP);

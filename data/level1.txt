@@ -240,4 +240,4 @@ Tile Bush 0 -1 624 432 1 1
 Tile Bush 0 -1 672 432 1 1
 Tile Bush 0 -1 720 432 1 1
 Tile Bush 0 -1 768 432 1 1
-Player 456 264 30 44 5 3
+Player 456 264 32 32 4 3

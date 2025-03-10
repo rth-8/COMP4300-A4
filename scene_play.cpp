@@ -302,10 +302,62 @@ void ScenePlay::sRender()
     }
 }
 
+void ScenePlay::startMoving(std::string name)
+{
+    if (name == "PLAYERUP") startUp();
+    else if (name == "PLAYERDOWN") startDown();
+    else if (name == "PLAYERLEFT") startLeft();
+    else if (name == "PLAYERRIGHT") startRight();
+}
+
+void ScenePlay::startUp()
+{
+    this->player->getComponent<CInput>().up = true;
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingUp"));
+    this->player->getComponent<CTransform>().speed.y = -playerCfg.speed;
+    this->player->getComponent<CTransform>().scale.x = 1;
+}
+
+void ScenePlay::startDown()
+{
+    this->player->getComponent<CInput>().down = true;
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingDown"));
+    this->player->getComponent<CTransform>().speed.y = playerCfg.speed;
+    this->player->getComponent<CTransform>().scale.x = 1;
+}
+
+void ScenePlay::startLeft()
+{
+    this->player->getComponent<CInput>().left = true;
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
+    this->player->getComponent<CTransform>().speed.x = -playerCfg.speed;
+    this->player->getComponent<CTransform>().scale.x = -1;
+}
+
+void ScenePlay::startRight()
+{
+    this->player->getComponent<CInput>().right = true;
+    this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
+    this->player->getComponent<CTransform>().speed.x = playerCfg.speed;
+    this->player->getComponent<CTransform>().scale.x = 1;
+}
+
+bool ScenePlay::isPlayerMoving()
+{
+    if (this->player->getComponent<CInput>().up == true ||
+        this->player->getComponent<CInput>().down == true ||
+        this->player->getComponent<CInput>().left == true ||
+        this->player->getComponent<CInput>().right == true)
+        return true;
+    else
+        return false;
+}
+
 void ScenePlay::sDoAction(const Action& action)
 {
-    // std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
-    
+    std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
+    std::cout << "waiting: " << waitingAction << "\n";
+
     if (action.type() == "START")
     {
         if (action.name() == "RETURNTOMENU")
@@ -315,54 +367,34 @@ void ScenePlay::sDoAction(const Action& action)
         else
         if (action.name() == "PLAYERUP")
         {
-            // if (this->player->getComponent<CInput>().down == false &&
-                // this->player->getComponent<CInput>().left == false &&
-                // this->player->getComponent<CInput>().right == false)
-            // {
-                this->player->getComponent<CInput>().up = true;
-                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingUp"));
-                this->player->getComponent<CTransform>().speed.y = -playerCfg.speed;
-                this->player->getComponent<CTransform>().scale.x = 1;
-            // }
+            if (isPlayerMoving())
+                waitingAction = action.name();
+            else
+                startUp();
         }
         else
         if (action.name() == "PLAYERDOWN")
         {
-            // if (this->player->getComponent<CInput>().up == false &&
-                // this->player->getComponent<CInput>().left == false &&
-                // this->player->getComponent<CInput>().right == false)
-            // {
-                this->player->getComponent<CInput>().down = true;
-                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingDown"));
-                this->player->getComponent<CTransform>().speed.y = playerCfg.speed;
-                this->player->getComponent<CTransform>().scale.x = 1;
-            // }
+            if (isPlayerMoving())
+                waitingAction = action.name();
+            else
+                startDown();
         }
         else
         if (action.name() == "PLAYERLEFT")
         {
-            // if (this->player->getComponent<CInput>().up == false &&
-                // this->player->getComponent<CInput>().down == false &&
-                // this->player->getComponent<CInput>().right == false)
-            // {
-                this->player->getComponent<CInput>().left = true;
-                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
-                this->player->getComponent<CTransform>().speed.x = -playerCfg.speed;
-                this->player->getComponent<CTransform>().scale.x = -1;
-            // }
+            if (isPlayerMoving())
+                waitingAction = action.name();
+            else
+                startLeft();
         }
         else
         if (action.name() == "PLAYERRIGHT")
         {
-            // if (this->player->getComponent<CInput>().up == false &&
-                // this->player->getComponent<CInput>().down == false &&
-                // this->player->getComponent<CInput>().left == false)
-            // {
-                this->player->getComponent<CInput>().right = true;
-                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
-                this->player->getComponent<CTransform>().speed.x = playerCfg.speed;
-                this->player->getComponent<CTransform>().scale.x = 1;
-            // }
+            if (isPlayerMoving())
+                waitingAction = action.name();
+            else
+                startRight();
         }
         else
         if (action.name() == "TOGLEBB")
@@ -375,30 +407,66 @@ void ScenePlay::sDoAction(const Action& action)
     {
         if (action.name() == "PLAYERUP")
         {
+            if (waitingAction == action.name())
+                waitingAction.clear();
+
             this->player->getComponent<CInput>().up = false;
             this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingUp"));
             this->player->getComponent<CTransform>().speed.y = 0;
+            
+            if (!waitingAction.empty())
+            {
+                startMoving(waitingAction);
+                waitingAction.clear();
+            }
         }
         else
         if (action.name() == "PLAYERDOWN")
         {
+            if (waitingAction == action.name())
+                waitingAction.clear();
+            
             this->player->getComponent<CInput>().down = false;
             this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"));
             this->player->getComponent<CTransform>().speed.y = 0;
+            
+            if (!waitingAction.empty())
+            {
+                startMoving(waitingAction);
+                waitingAction.clear();
+            }
         }
         else
         if (action.name() == "PLAYERLEFT")
         {
+            if (waitingAction == action.name())
+                waitingAction.clear();
+            
             this->player->getComponent<CInput>().left = false;
             this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"));
             this->player->getComponent<CTransform>().speed.x = 0;
+            
+            if (!waitingAction.empty())
+            {
+                startMoving(waitingAction);
+                waitingAction.clear();
+            }
         }
         else
         if (action.name() == "PLAYERRIGHT")
         {
+            if (waitingAction == action.name())
+                waitingAction.clear();
+            
             this->player->getComponent<CInput>().right = false;
             this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"));
             this->player->getComponent<CTransform>().speed.x = 0;
+            
+            if (!waitingAction.empty())
+            {
+                startMoving(waitingAction);
+                waitingAction.clear();
+            }
         }
     }
 }
