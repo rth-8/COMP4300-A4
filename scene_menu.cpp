@@ -74,19 +74,23 @@ void SceneMenu::sDoAction(const Action& action)
         if (action.name() == "MENUUP")
         {
             if (menuIndex > 0)
+            {
                 menuIndex--;
             
-            menuTexts[menuIndex+1]->setFillColor(sf::Color::Yellow);
-            menuTexts[menuIndex+2]->setFillColor(sf::Color::Black);
+                menuTexts[menuIndex+1]->setFillColor(sf::Color::Yellow);
+                menuTexts[menuIndex+2]->setFillColor(sf::Color::Black);
+            }
         }
         else
         if (action.name() == "MENUDOWN")
         {
             if (menuIndex < levelPaths.size()-1)
+            {
                 menuIndex++;
             
-            menuTexts[menuIndex+1]->setFillColor(sf::Color::Yellow);
-            menuTexts[menuIndex]->setFillColor(sf::Color::Black);
+                menuTexts[menuIndex+1]->setFillColor(sf::Color::Yellow);
+                menuTexts[menuIndex]->setFillColor(sf::Color::Black);
+            }
         }
         else
         if (action.name() == "MENUSELECT")
