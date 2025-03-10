@@ -315,54 +315,54 @@ void ScenePlay::sDoAction(const Action& action)
         else
         if (action.name() == "PLAYERUP")
         {
-            if (this->player->getComponent<CInput>().down == false &&
-                this->player->getComponent<CInput>().left == false &&
-                this->player->getComponent<CInput>().right == false)
-            {
+            // if (this->player->getComponent<CInput>().down == false &&
+                // this->player->getComponent<CInput>().left == false &&
+                // this->player->getComponent<CInput>().right == false)
+            // {
                 this->player->getComponent<CInput>().up = true;
                 this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingUp"));
                 this->player->getComponent<CTransform>().speed.y = -playerCfg.speed;
                 this->player->getComponent<CTransform>().scale.x = 1;
-            }
+            // }
         }
         else
         if (action.name() == "PLAYERDOWN")
         {
-            if (this->player->getComponent<CInput>().up == false &&
-                this->player->getComponent<CInput>().left == false &&
-                this->player->getComponent<CInput>().right == false)
-            {
+            // if (this->player->getComponent<CInput>().up == false &&
+                // this->player->getComponent<CInput>().left == false &&
+                // this->player->getComponent<CInput>().right == false)
+            // {
                 this->player->getComponent<CInput>().down = true;
                 this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingDown"));
                 this->player->getComponent<CTransform>().speed.y = playerCfg.speed;
                 this->player->getComponent<CTransform>().scale.x = 1;
-            }
+            // }
         }
         else
         if (action.name() == "PLAYERLEFT")
         {
-            if (this->player->getComponent<CInput>().up == false &&
-                this->player->getComponent<CInput>().down == false &&
-                this->player->getComponent<CInput>().right == false)
-            {
+            // if (this->player->getComponent<CInput>().up == false &&
+                // this->player->getComponent<CInput>().down == false &&
+                // this->player->getComponent<CInput>().right == false)
+            // {
                 this->player->getComponent<CInput>().left = true;
                 this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
                 this->player->getComponent<CTransform>().speed.x = -playerCfg.speed;
                 this->player->getComponent<CTransform>().scale.x = -1;
-            }
+            // }
         }
         else
         if (action.name() == "PLAYERRIGHT")
         {
-            if (this->player->getComponent<CInput>().up == false &&
-                this->player->getComponent<CInput>().down == false &&
-                this->player->getComponent<CInput>().left == false)
-            {
+            // if (this->player->getComponent<CInput>().up == false &&
+                // this->player->getComponent<CInput>().down == false &&
+                // this->player->getComponent<CInput>().left == false)
+            // {
                 this->player->getComponent<CInput>().right = true;
                 this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"));
                 this->player->getComponent<CTransform>().speed.x = playerCfg.speed;
                 this->player->getComponent<CTransform>().scale.x = 1;
-            }
+            // }
         }
         else
         if (action.name() == "TOGLEBB")
