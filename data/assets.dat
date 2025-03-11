@@ -16,6 +16,7 @@ Texture TexWaterBL gfx/water1_000006.png
 Texture TexWaterBM gfx/water1_000007.png
 Texture TexWaterBR gfx/water1_000008.png
 Texture TexSmallRedSlime gfx/small_red_slime1.png
+Texture TexSmallJelly gfx/small_jelly1.png
 Animation Boulder TexBoulder 1 0
 Animation Bush TexBush 1 0
 Animation PlayerStandingUp TexPlayerStandingUp 1 0
@@ -34,4 +35,5 @@ Animation WaterBL TexWaterBL 1 0
 Animation WaterBM TexWaterBM 1 0
 Animation WaterBR TexWaterBR 1 0
 Animation SmallRedSlime TexSmallRedSlime 4 10
+Animation SmallJelly TexSmallJelly 4 10
 Font MenuFont fonts/menu_font.ttf

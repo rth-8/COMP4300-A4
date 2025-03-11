@@ -132,6 +132,19 @@ void ScenePlay::load_level()
                     else
                     if (aiType == "Patrol")
                     {
+                        int cnt;
+                        float x, y;
+                        std::vector<Vec2> positions;
+                        
+                        ss >> speed >> cnt;
+                        
+                        for (int i=0; i<cnt; ++i)
+                        {
+                            ss >> x >> y;
+                            positions.push_back(Vec2(x + bb.halfSize.x, y + bb.halfSize.y));
+                        }
+                        
+                        e->addComponent<CPatrol>(positions, speed);
                     }
                 }
             }
@@ -228,6 +241,16 @@ static bool checkIntersection(const Vec2& a, const Vec2& b, const Vec2& c, const
         return false;
 }
 
+#define RANGE 2.0
+bool static reachedPosition(const Vec2& p1, const Vec2& p2)
+{
+    if (p1.x >= p2.x - RANGE && p1.x <= p2.x + RANGE &&
+        p1.y >= p2.y - RANGE && p1.y <= p2.y + RANGE)
+        return true;
+    else
+        return false;
+}
+
 void ScenePlay::sAi()
 {
     auto& playerTrans = this->player->getComponent<CTransform>();
@@ -297,16 +320,29 @@ void ScenePlay::sAi()
                 npcTrans.speed.normalize().mul(e->getComponent<CFollowPlayer>().speed);
                 
                 // if home position is reached (+-), then stop movement
-                if (npcTrans.pos.x >= e->getComponent<CFollowPlayer>().home.x - 1.0 &&
-                    npcTrans.pos.x <= e->getComponent<CFollowPlayer>().home.x + 1.0 &&
-                    npcTrans.pos.y >= e->getComponent<CFollowPlayer>().home.y - 1.0 &&
-                    npcTrans.pos.y <= e->getComponent<CFollowPlayer>().home.x + 1.0)
+                if (reachedPosition(npcTrans.pos, e->getComponent<CFollowPlayer>().home))
                 {
                     npcTrans.pos.x = e->getComponent<CFollowPlayer>().home.x;
                     npcTrans.pos.y = e->getComponent<CFollowPlayer>().home.y;
                     npcTrans.speed.x = 0;
                     npcTrans.speed.y = 0;
                 }
+            }
+        }
+        
+        if (e->hasComponent<CPatrol>())
+        {
+            auto& patrol = e->getComponent<CPatrol>();
+            
+            if (reachedPosition(npcTrans.pos, patrol.positions[patrol.currentPos]))
+            {
+                npcTrans.pos.x = patrol.positions[patrol.currentPos].x;
+                npcTrans.pos.y = patrol.positions[patrol.currentPos].y;
+                
+                patrol.currentPos = (patrol.currentPos + 1) % patrol.positions.size();
+            
+                npcTrans.speed = patrol.positions[patrol.currentPos] - npcTrans.pos;
+                npcTrans.speed.normalize().mul(patrol.speed);
             }
         }
     }
@@ -458,6 +494,14 @@ static void drawPoint(sf::RenderWindow & window, float x, float y, int size)
     window.draw(line2.data(), line2.size(), sf::PrimitiveType::Lines);
 }
 
+static void drawDot(sf::RenderWindow & window, float x, float y, int size)
+{
+    sf::CircleShape circle(size, 4);
+    circle.setPosition(sf::Vector2f(x - size, y - size));
+    circle.setFillColor(sf::Color(0, 0, 0, 255));
+    window.draw(circle);
+}
+
 static void drawBB(sf::RenderWindow & window, const CTransform& trans, const CBoundingBox& bb)
 {
     sf::RectangleShape rectangle({bb.size.x, bb.size.y});
@@ -497,7 +541,7 @@ void ScenePlay::sRender()
         if (this->isDrawingBB)
         {
             drawBB(*w, t, e->getComponent<CBoundingBox>());
-            drawPoint(*w, t.pos.x, t.pos.y, 10);
+            drawPoint(*w, t.pos.x, t.pos.y, 12);
             
             if (e->hasComponent<CFollowPlayer>())
             {
@@ -505,6 +549,12 @@ void ScenePlay::sRender()
                          e->getComponent<CTransform>().pos.x, e->getComponent<CTransform>().pos.y,
                          this->player->getComponent<CTransform>().pos.x, this->player->getComponent<CTransform>().pos.y
                 );
+            }
+            
+            if (e->hasComponent<CPatrol>())
+            {
+                for (auto& p : e->getComponent<CPatrol>().positions)
+                    drawDot(*w, p.x, p.y, 5);
             }
         }
     }
