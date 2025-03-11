@@ -194,16 +194,33 @@ void ScenePlay::sAnimation()
         // return Vec2(0, 0);
 // }
 
+// static bool checkIntersection(const Vec2& a, const Vec2& b, const Vec2& c, const Vec2& d)
+// {
+    // Vec2 v = b - a;
+    // Vec2 u = d - c;
+    
+    // Vec2 c_a = c - a;
+    // Vec2 a_c = a - c;
+    
+    // float r = c_a.crossProd(u) / v.crossProd(u);
+    // float s = a_c.crossProd(v) / u.crossProd(v);
+    
+    // if (r >= 0 && r <= 1 && s >= 0 && s <= 1)
+        // return true;
+    // else
+        // return false;
+// }
+
 static bool checkIntersection(const Vec2& a, const Vec2& b, const Vec2& c, const Vec2& d)
 {
     Vec2 v = b - a;
     Vec2 u = d - c;
     
     Vec2 c_a = c - a;
-    Vec2 a_c = a - c;
+    float vxu = v.crossProd(u);
     
-    float r = c_a.crossProd(u) / v.crossProd(u);
-    float s = a_c.crossProd(v) / u.crossProd(v);
+    float r = c_a.crossProd(u) / vxu;
+    float s = c_a.crossProd(v) / vxu;
     
     if (r >= 0 && r <= 1 && s >= 0 && s <= 1)
         return true;
@@ -280,10 +297,10 @@ void ScenePlay::sAi()
                 npcTrans.speed.normalize().mul(e->getComponent<CFollowPlayer>().speed);
                 
                 // if home position is reached (+-), then stop movement
-                if (npcTrans.pos.x >= e->getComponent<CFollowPlayer>().home.x - 0.8 &&
-                    npcTrans.pos.x <= e->getComponent<CFollowPlayer>().home.x + 0.8 &&
-                    npcTrans.pos.y >= e->getComponent<CFollowPlayer>().home.y - 0.8 &&
-                    npcTrans.pos.y <= e->getComponent<CFollowPlayer>().home.x + 0.8)
+                if (npcTrans.pos.x >= e->getComponent<CFollowPlayer>().home.x - 1.0 &&
+                    npcTrans.pos.x <= e->getComponent<CFollowPlayer>().home.x + 1.0 &&
+                    npcTrans.pos.y >= e->getComponent<CFollowPlayer>().home.y - 1.0 &&
+                    npcTrans.pos.y <= e->getComponent<CFollowPlayer>().home.x + 1.0)
                 {
                     npcTrans.pos.x = e->getComponent<CFollowPlayer>().home.x;
                     npcTrans.pos.y = e->getComponent<CFollowPlayer>().home.y;
