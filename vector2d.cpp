@@ -97,3 +97,8 @@ Vec2 & Vec2::normalize()
     }
     return *this;
 }
+
+float Vec2::crossProd(const Vec2 & rhs)
+{
+    return ((this->x * rhs.y) - (this->y * rhs.x)); 
+}

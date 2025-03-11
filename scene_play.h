@@ -15,7 +15,7 @@ class ScenePlay : public Scene
     {
         int spawn_x;
         int spawn_y;
-        int speed;
+        float speed;
     };
     
     sf::View view;
@@ -51,6 +51,7 @@ public:
     void update();
     
     void sAnimation();
+    void sAi();
     void sMovement();
     void sEnemySpawner();
     void sCollision();

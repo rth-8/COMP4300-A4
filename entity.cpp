@@ -7,6 +7,20 @@ Entity::Entity(const std::string & tag, int id)
 {
     this->id = id;
     this->tag = tag;
+    
+    this->removeComponent<CAnimation>();
+    this->removeComponent<CTransform>();
+    this->removeComponent<CBoundingBox>();
+    this->removeComponent<CLifeSpan>();
+    this->removeComponent<CInput>();
+    this->removeComponent<CGravity>();
+    this->removeComponent<CState>();
+    this->removeComponent<CDamage>();
+    this->removeComponent<CInvincibility>();
+    this->removeComponent<CHealth>();
+    this->removeComponent<CFollowPlayer>();
+    this->removeComponent<CPatrol>();
+    
     // std::cout << "ENTITY " << this->tag << " (" << this->id << ") created\n";
 }
 

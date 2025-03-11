@@ -26,6 +26,8 @@ public:
     float mag();
     
     Vec2 & normalize();
+    
+    float crossProd(const Vec2 & rhs);
 };
 
 #endif

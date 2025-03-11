@@ -23,8 +23,10 @@ void SceneMenu::init()
     
     menuStrings.push_back("NOT ZELDA\n");
     menuStrings.push_back("Level 1\n");
+    menuStrings.push_back("Level 2\n");
     
     levelPaths.push_back("data/level1.txt");
+    levelPaths.push_back("data/level2.txt");
     
     auto& font = this->engine->getAssets()->getFont("MenuFont");
     std::vector<float> sizes{80, 48, 48};

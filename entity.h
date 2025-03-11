@@ -67,7 +67,9 @@ public:
     template <typename T> 
     void removeComponent()
     {
-        getComponent<T>() = T();
+        auto & comp = getComponent<T>();
+        comp = T();
+        comp.has = false;
     }
 };
 
