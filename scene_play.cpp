@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <cmath>
 
 #include "scene_play.h"
 #include "game_engine.h"
@@ -89,8 +90,9 @@ void ScenePlay::load_level()
                 {
                     int bbX;
                     int bbY;
+                    int maxHealth;
             
-                    ss >> playerCfg.spawn_x >> playerCfg.spawn_y >> bbX >> bbY >> playerCfg.speed;
+                    ss >> playerCfg.spawn_x >> playerCfg.spawn_y >> bbX >> bbY >> playerCfg.speed >> maxHealth;
                     
                     // create player entity
                     this->player = manager->addEntity("Player");
@@ -98,6 +100,7 @@ void ScenePlay::load_level()
                     this->player->addComponent<CTransform>(Vec2(playerCfg.spawn_x, playerCfg.spawn_y));
                     this->player->addComponent<CInput>();
                     this->player->addComponent<CBoundingBox>(Vec2(bbX, bbY), 1, 1);
+                    this->player->addComponent<CHealth>(maxHealth, maxHealth);
                 }
                 else
                 if (token == "NPC")
@@ -122,6 +125,7 @@ void ScenePlay::load_level()
                         tileX + (roomX * this->windowW) + bb.halfSize.x, 
                         tileY + (roomY * this->windowH) + bb.halfSize.y)
                     );
+                    e->addComponent<CHealth>(maxHealth, maxHealth);
                     
                     if (aiType == "Follow")
                     {
@@ -519,6 +523,31 @@ static void drawBB(sf::RenderWindow & window, const CTransform& trans, const CBo
     window.draw(rectangle);
 }
 
+static void drawHealth(sf::RenderWindow & window, const CTransform& trans, const Vec2& size, const CHealth& health)
+{
+    float w = 66;
+    float x = trans.pos.x - 32;
+    float y = trans.pos.y - size.y;
+    
+    sf::RectangleShape rectangle({w, 8});
+    rectangle.setPosition(sf::Vector2f(x, y));
+    rectangle.setFillColor(sf::Color(20, 20, 20, 255));
+    window.draw(rectangle);
+    
+    int margin = 3;
+    float hbar = (w - (margin * (health.max + 1))) / health.max;
+    x += margin;
+    for (int i=0; i<health.max; ++i)
+    {
+        sf::RectangleShape rectangle({hbar, 4});
+        rectangle.setPosition(sf::Vector2f(x, y + 2));
+        rectangle.setFillColor(sf::Color(255, 0, 0, 255));
+        window.draw(rectangle);
+        
+        x += hbar + margin;
+    }
+}
+
 void ScenePlay::sRender()
 {
     auto w = this->engine->getWindow();
@@ -537,6 +566,11 @@ void ScenePlay::sRender()
         spr.setPosition({t.pos.x, t.pos.y});
         spr.setScale({t.scale.x, t.scale.y});
         w->draw(spr);
+        
+        if (e->hasComponent<CHealth>())
+        {
+            drawHealth(*w, t, e->getComponent<CAnimation>().getAnimation()->getSize(), e->getComponent<CHealth>());
+        }
         
         if (this->isDrawingBB)
         {
