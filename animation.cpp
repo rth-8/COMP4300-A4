@@ -57,3 +57,8 @@ sf::Sprite & Animation::getSprite()
 {
     return *sprite;
 }
+
+int Animation::getDuration()
+{
+    return (this->frameCount * this->speed); 
+}

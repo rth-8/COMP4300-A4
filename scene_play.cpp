@@ -190,7 +190,13 @@ void ScenePlay::sAnimation()
         if (e->isAlive() == false)
             continue;
 
-        e->getComponent<CAnimation>().getAnimation()->update(currentFrame);
+        auto& ac = e->getComponent<CAnimation>();
+        auto* anim = ac.getAnimation();
+        
+        if (anim->getName() == "Explosion")
+            anim->update(ac.frame++);
+        else
+            anim->update(currentFrame);
         
         if (e->hasComponent<CLifeSpan>())
         {
@@ -508,7 +514,15 @@ void ScenePlay::sCollision()
                 this->sword->removeComponent<CDamage>();
                 
                 if (e->getComponent<CHealth>().current == 0)
+                {
                     e->kill();
+                    
+                    // spawn explosion at same position
+                    auto explosion = manager->addEntity("Explosion");
+                    explosion->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("Explosion"), false);
+                    explosion->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x, e->getComponent<CTransform>().pos.y));
+                    explosion->addComponent<CLifeSpan>(explosion->getComponent<CAnimation>().getAnimation()->getDuration(), currentFrame);
+                }
             }
         }
     }
