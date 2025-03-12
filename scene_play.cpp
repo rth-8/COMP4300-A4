@@ -819,15 +819,20 @@ void ScenePlay::sDoAction(const Action& action)
         {
             if (waitingAction == action.name())
                 waitingAction.clear();
-
-            this->player->getComponent<CInput>().up = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingUp"), true);
-            this->player->getComponent<CTransform>().speed.y = 0;
-            
-            if (!waitingAction.empty())
+            else
             {
-                startMoving(waitingAction);
-                waitingAction.clear();
+                this->player->getComponent<CInput>().up = false;
+                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingUp"), true);
+                this->player->getComponent<CTransform>().speed.y = 0;
+            }
+            
+            if (this->player->getComponent<CState>().state != "attacking")
+            {
+                if (!waitingAction.empty())
+                {
+                    startMoving(waitingAction);
+                    waitingAction.clear();
+                }
             }
         }
         else
@@ -835,15 +840,20 @@ void ScenePlay::sDoAction(const Action& action)
         {
             if (waitingAction == action.name())
                 waitingAction.clear();
-            
-            this->player->getComponent<CInput>().down = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"), true);
-            this->player->getComponent<CTransform>().speed.y = 0;
-            
-            if (!waitingAction.empty())
+            else
             {
-                startMoving(waitingAction);
-                waitingAction.clear();
+                this->player->getComponent<CInput>().down = false;
+                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingDown"), true);
+                this->player->getComponent<CTransform>().speed.y = 0;
+            }
+            
+            if (this->player->getComponent<CState>().state != "attacking")
+            {
+                if (!waitingAction.empty())
+                {
+                    startMoving(waitingAction);
+                    waitingAction.clear();
+                }
             }
         }
         else
@@ -851,15 +861,20 @@ void ScenePlay::sDoAction(const Action& action)
         {
             if (waitingAction == action.name())
                 waitingAction.clear();
-            
-            this->player->getComponent<CInput>().left = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"), true);
-            this->player->getComponent<CTransform>().speed.x = 0;
-            
-            if (!waitingAction.empty())
+            else
             {
-                startMoving(waitingAction);
-                waitingAction.clear();
+                this->player->getComponent<CInput>().left = false;
+                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"), true);
+                this->player->getComponent<CTransform>().speed.x = 0;
+            }
+            
+            if (this->player->getComponent<CState>().state != "attacking")
+            {
+                if (!waitingAction.empty())
+                {
+                    startMoving(waitingAction);
+                    waitingAction.clear();
+                }
             }
         }
         else
@@ -867,27 +882,22 @@ void ScenePlay::sDoAction(const Action& action)
         {
             if (waitingAction == action.name())
                 waitingAction.clear();
-            
-            this->player->getComponent<CInput>().right = false;
-            this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"), true);
-            this->player->getComponent<CTransform>().speed.x = 0;
-            
-            if (!waitingAction.empty())
+            else
             {
-                startMoving(waitingAction);
-                waitingAction.clear();
+                this->player->getComponent<CInput>().right = false;
+                this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerStandingHoriz"), true);
+                this->player->getComponent<CTransform>().speed.x = 0;
+            }
+            
+            if (this->player->getComponent<CState>().state != "attacking")
+            {
+                if (!waitingAction.empty())
+                {
+                    startMoving(waitingAction);
+                    waitingAction.clear();
+                }
             }
         }
-        // else
-        // if (action.name() == "PLAYERATTACK")
-        // {
-            // if (!waitingAction.empty())
-            // {
-                // if (this->player->getComponent<CState>().state != "attacking")
-                    // startMoving(waitingAction);
-                // waitingAction.clear();
-            // }
-        // }
     }
 }
 
