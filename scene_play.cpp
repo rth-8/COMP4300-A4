@@ -39,6 +39,7 @@ void ScenePlay::init()
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Down), "PLAYERDOWN");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Left), "PLAYERLEFT");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Right), "PLAYERRIGHT");
+    registerAction(static_cast<int>(sf::Keyboard::Scancode::Space), "PLAYERATTACK");
 
     registerAction(static_cast<int>(sf::Keyboard::Scancode::C), "TOGLEBB");
 
@@ -101,6 +102,7 @@ void ScenePlay::load_level()
                     this->player->addComponent<CInput>();
                     this->player->addComponent<CBoundingBox>(Vec2(bbX, bbY), 1, 1);
                     this->player->addComponent<CHealth>(maxHealth, maxHealth);
+                    this->player->addComponent<CState>("facingdown");
                 }
                 else
                 if (token == "NPC")
@@ -191,6 +193,30 @@ void ScenePlay::sAnimation()
             continue;
 
         e->getComponent<CAnimation>().getAnimation()->update(currentFrame);
+        
+        if (e->hasComponent<CLifeSpan>())
+        {
+            if (e->getComponent<CLifeSpan>().frameCreated + e->getComponent<CLifeSpan>().lifespan == currentFrame)
+            {
+                e->kill();
+                
+                if (e == this->sword)
+                {
+                    this->sword = nullptr;
+                    if (this->player->getComponent<CState>().state == "attacking")
+                    {
+                        this->player->getComponent<CState>().state = this->player->getComponent<CState>().prev;
+                        this->player->getComponent<CState>().prev = "none";
+                        
+                        if (!waitingAction.empty())
+                        {
+                            startMoving(waitingAction);
+                            waitingAction.clear();
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -359,6 +385,12 @@ void ScenePlay::sMovement()
         if (e->isAlive() == false)
             continue;
 
+        if (e == this->player)
+        {
+            if (this->player->getComponent<CState>().state == "attacking")
+                continue;
+        }
+        
         auto& trans = e->getComponent<CTransform>();
         // auto& bb = e->getComponent<CBoundingBox>();
         
@@ -467,6 +499,21 @@ void ScenePlay::sCollision()
             }
         }
     }
+    
+    if (this->sword != nullptr && this->sword->hasComponent<CDamage>())
+    {
+        for (auto e : this->manager->getEntities("NPC"))
+        {
+            if (checkCollision(e, this->sword, cVec))
+            {
+                e->getComponent<CHealth>().current -= 1;
+                this->sword->removeComponent<CDamage>();
+                
+                if (e->getComponent<CHealth>().current == 0)
+                    e->kill();
+            }
+        }
+    }
 }
 
 static void drawLine(sf::RenderWindow & window, float x1, float y1, float x2, float y2)
@@ -537,7 +584,7 @@ static void drawHealth(sf::RenderWindow & window, const CTransform& trans, const
     int margin = 3;
     float hbar = (w - (margin * (health.max + 1))) / health.max;
     x += margin;
-    for (int i=0; i<health.max; ++i)
+    for (int i=0; i<health.current; ++i)
     {
         sf::RectangleShape rectangle({hbar, 4});
         rectangle.setPosition(sf::Vector2f(x, y + 2));
@@ -608,6 +655,7 @@ void ScenePlay::startUp()
     this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingUp"), true);
     this->player->getComponent<CTransform>().speed.y = -playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = 1;
+    this->player->getComponent<CState>().state = "facingup";
 }
 
 void ScenePlay::startDown()
@@ -616,6 +664,7 @@ void ScenePlay::startDown()
     this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingDown"), true);
     this->player->getComponent<CTransform>().speed.y = playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = 1;
+    this->player->getComponent<CState>().state = "facingdown";
 }
 
 void ScenePlay::startLeft()
@@ -624,6 +673,7 @@ void ScenePlay::startLeft()
     this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"), true);
     this->player->getComponent<CTransform>().speed.x = -playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = -1;
+    this->player->getComponent<CState>().state = "facingleft";
 }
 
 void ScenePlay::startRight()
@@ -632,6 +682,7 @@ void ScenePlay::startRight()
     this->player->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("PlayerMovingHoriz"), true);
     this->player->getComponent<CTransform>().speed.x = playerCfg.speed;
     this->player->getComponent<CTransform>().scale.x = 1;
+    this->player->getComponent<CState>().state = "facingright";
 }
 
 bool ScenePlay::isPlayerMoving()
@@ -647,8 +698,8 @@ bool ScenePlay::isPlayerMoving()
 
 void ScenePlay::sDoAction(const Action& action)
 {
-    // std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
-    // std::cout << "waiting: " << waitingAction << "\n";
+    std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
+    std::cout << "waiting: " << waitingAction << "\n";
 
     if (action.type() == "START")
     {
@@ -659,6 +710,9 @@ void ScenePlay::sDoAction(const Action& action)
         else
         if (action.name() == "PLAYERUP")
         {
+            if (this->player->getComponent<CState>().state == "attacking")
+                waitingAction = action.name();
+            else
             if (isPlayerMoving())
                 waitingAction = action.name();
             else
@@ -667,6 +721,9 @@ void ScenePlay::sDoAction(const Action& action)
         else
         if (action.name() == "PLAYERDOWN")
         {
+            if (this->player->getComponent<CState>().state == "attacking")
+                waitingAction = action.name();
+            else
             if (isPlayerMoving())
                 waitingAction = action.name();
             else
@@ -675,6 +732,9 @@ void ScenePlay::sDoAction(const Action& action)
         else
         if (action.name() == "PLAYERLEFT")
         {
+            if (this->player->getComponent<CState>().state == "attacking")
+                waitingAction = action.name();
+            else
             if (isPlayerMoving())
                 waitingAction = action.name();
             else
@@ -683,10 +743,70 @@ void ScenePlay::sDoAction(const Action& action)
         else
         if (action.name() == "PLAYERRIGHT")
         {
+            if (this->player->getComponent<CState>().state == "attacking")
+                waitingAction = action.name();
+            else
             if (isPlayerMoving())
                 waitingAction = action.name();
             else
                 startRight();
+        }
+        else
+        if (action.name() == "PLAYERATTACK")
+        {
+            if (this->player->getComponent<CState>().state != "attacking" && this->sword == nullptr)
+            {
+                auto& ps = this->player->getComponent<CState>();
+                auto& pt = this->player->getComponent<CTransform>();
+                auto& pb = this->player->getComponent<CBoundingBox>();
+                
+                ps.prev = ps.state;
+                ps.state = "attacking";
+                
+                this->sword = manager->addEntity("Sword");
+                if (ps.prev == "facingup")
+                {
+                    // attacking to up
+                    this->sword->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("SwordDown"), true);
+                    auto& bb = this->sword->addComponent<CBoundingBox>(this->sword->getComponent<CAnimation>().getAnimation()->getSize(), 0, 0);
+                    auto& t = this->sword->addComponent<CTransform>(Vec2(pt.pos.x, pt.pos.y - pb.halfSize.y - bb.halfSize.y));
+                    t.scale.x = 1;
+                    t.scale.y = -1;
+                }
+                else
+                if (ps.prev == "facingdown")
+                {
+                    // attacking to up
+                    this->sword->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("SwordDown"), true);
+                    auto& bb = this->sword->addComponent<CBoundingBox>(this->sword->getComponent<CAnimation>().getAnimation()->getSize(), 0, 0);
+                    auto& t = this->sword->addComponent<CTransform>(Vec2(pt.pos.x, pt.pos.y + pb.halfSize.y + bb.halfSize.y));
+                    t.scale.x = 1;
+                    t.scale.y = 1;
+                }
+                else
+                if (ps.prev == "facingleft")
+                {
+                    // attacking to left
+                    this->sword->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("SwordRight"), true);
+                    auto& bb = this->sword->addComponent<CBoundingBox>(this->sword->getComponent<CAnimation>().getAnimation()->getSize(), 0, 0);
+                    auto& t = this->sword->addComponent<CTransform>(Vec2(pt.pos.x - pb.halfSize.x - bb.halfSize.x, pt.pos.y));
+                    t.scale.x = -1;
+                    t.scale.y = 1;
+                }
+                else
+                if (ps.prev == "facingright")
+                {
+                    // attacking to right
+                    this->sword->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("SwordRight"), true);
+                    auto& bb = this->sword->addComponent<CBoundingBox>(this->sword->getComponent<CAnimation>().getAnimation()->getSize(), 0, 0);
+                    auto& t = this->sword->addComponent<CTransform>(Vec2(pt.pos.x + pb.halfSize.x + bb.halfSize.x, pt.pos.y));
+                    t.scale.x = 1;
+                    t.scale.y = 1;
+                }
+                
+                this->sword->addComponent<CDamage>(1);
+                this->sword->addComponent<CLifeSpan>(20, currentFrame);
+            }
         }
         else
         if (action.name() == "TOGLEBB")
@@ -760,6 +880,16 @@ void ScenePlay::sDoAction(const Action& action)
                 waitingAction.clear();
             }
         }
+        // else
+        // if (action.name() == "PLAYERATTACK")
+        // {
+            // if (!waitingAction.empty())
+            // {
+                // if (this->player->getComponent<CState>().state != "attacking")
+                    // startMoving(waitingAction);
+                // waitingAction.clear();
+            // }
+        // }
     }
 }
 

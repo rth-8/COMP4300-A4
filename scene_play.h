@@ -29,6 +29,8 @@ class ScenePlay : public Scene
     std::shared_ptr<Entity> player;
     PlayerConfig playerCfg;
     
+    std::shared_ptr<Entity> sword = nullptr;
+    
     void init();
     void load_level();
     

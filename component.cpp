@@ -48,6 +48,16 @@ CLifeSpan::CLifeSpan(int duration, int frame) : lifespan(duration), frameCreated
 
 /*-----------------------------------------------------------------------------------------------*/
 
+CState::CState()
+{
+}
+
+CState::CState(const std::string& s) : state(s)
+{
+}
+
+/*-----------------------------------------------------------------------------------------------*/
+
 CDamage::CDamage()
 {
 }

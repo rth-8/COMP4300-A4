@@ -75,6 +75,12 @@ public:
 
 class CState : public CComponent
 {
+public:
+    std::string state = "none";
+    std::string prev = "none";
+    
+    CState();
+    CState(const std::string& s);
 };
 
 class CDamage : public CComponent
