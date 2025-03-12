@@ -118,7 +118,7 @@ public:
     float speed = 0;
     
     CFollowPlayer();
-    CFollowPlayer(Vec2& pos, float spd);
+    CFollowPlayer(const Vec2& pos, float spd);
 };
 
 class CPatrol : public CComponent
@@ -129,7 +129,9 @@ public:
     float speed = 0;
     
     CPatrol();
-    CPatrol(std::vector<Vec2>& pos, float spd);
+    CPatrol(float spd);
+    
+    void addPosition(float x, float y);
 };
 
 #endif

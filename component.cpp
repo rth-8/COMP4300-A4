@@ -93,7 +93,7 @@ CFollowPlayer::CFollowPlayer()
     
 }
 
-CFollowPlayer::CFollowPlayer(Vec2& pos, float spd) : home(pos), speed(spd)
+CFollowPlayer::CFollowPlayer(const Vec2& pos, float spd) : home(pos), speed(spd)
 {
 }
 
@@ -103,6 +103,12 @@ CPatrol::CPatrol()
 {
 }
 
-CPatrol::CPatrol(std::vector<Vec2>& pos, float spd) : positions(pos), speed(spd)
+CPatrol::CPatrol(float spd) : speed(spd)
 {
+    positions.reserve(10);
+}
+
+void CPatrol::addPosition(float x, float y)
+{
+    positions.emplace_back(x, y);
 }

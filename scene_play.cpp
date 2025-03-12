@@ -140,17 +140,15 @@ void ScenePlay::load_level()
                     {
                         int cnt;
                         float x, y;
-                        std::vector<Vec2> positions;
                         
                         ss >> speed >> cnt;
                         
+                        auto& patrol = e->addComponent<CPatrol>(speed);
                         for (int i=0; i<cnt; ++i)
                         {
                             ss >> x >> y;
-                            positions.push_back(Vec2(x + bb.halfSize.x, y + bb.halfSize.y));
+                            patrol.addPosition(x + bb.halfSize.x, y + bb.halfSize.y);
                         }
-                        
-                        e->addComponent<CPatrol>(positions, speed);
                     }
                 }
             }
