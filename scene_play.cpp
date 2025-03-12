@@ -510,6 +510,7 @@ void ScenePlay::sCollision()
         {
             if (checkCollision(e, this->sword, cVec))
             {
+                this->engine->getAssets()->getSound("HurtSound").play();
                 e->getComponent<CHealth>().current -= 1;
                 this->sword->removeComponent<CDamage>();
                 
