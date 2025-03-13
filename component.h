@@ -86,7 +86,7 @@ public:
 class CDamage : public CComponent
 {
 public:
-    int damage = 1;
+    int damage = 0;
     
     CDamage();
     CDamage(int dmg);

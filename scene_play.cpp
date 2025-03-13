@@ -116,7 +116,9 @@ void ScenePlay::load_level()
                     float speed;
             
                     ss >> animName >> roomX >> roomY >> tileX >> tileY >> blockM >> blockV >> maxHealth >> damage >> aiType;
-                    // std::cout << "NPC: " << animName << ", [" << roomX << "," << roomY << "], [" << tileX << "," << tileY << "], " << blockM << ", " << blockV << ", "
+                    // std::cout << "NPC: " << animName 
+                              // << ", [" << roomX << "," << roomY << "], [" << tileX << "," << tileY << "], " 
+                              // << blockM << ", " << blockV << ", "
                               // << maxHealth << ", " << damage << ", " << aiType << "\n";
                     
                     // create npc entity
@@ -128,6 +130,7 @@ void ScenePlay::load_level()
                         tileY + (roomY * this->windowH) + bb.halfSize.y)
                     );
                     e->addComponent<CHealth>(maxHealth, maxHealth);
+                    e->addComponent<CDamage>(damage);
                     
                     if (aiType == "Follow")
                     {
@@ -517,6 +520,7 @@ void ScenePlay::sCollision()
             if (checkCollision(e, this->player, cVec))
             {
                 // npc hurts player
+                // std::cout << "DMG: " << e->getComponent<CDamage>().damage << "\n";
                 this->player->getComponent<CHealth>().current -= e->getComponent<CDamage>().damage;
                 
                 if (this->player->getComponent<CHealth>().current == 0)
@@ -750,8 +754,8 @@ bool ScenePlay::isPlayerMoving()
 
 void ScenePlay::sDoAction(const Action& action)
 {
-    std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
-    std::cout << "waiting: " << waitingAction << "\n";
+    // std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
+    // std::cout << "waiting: " << waitingAction << "\n";
 
     if (action.type() == "START")
     {
