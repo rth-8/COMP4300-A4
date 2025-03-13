@@ -17,6 +17,13 @@ Vec2::Vec2(const Vec2 & src)
     this->y = src.y;
 }
 
+Vec2& Vec2::operator=(const Vec2& rhs)
+{
+    this->x = rhs.x;
+    this->y = rhs.y;
+    return *this;
+}
+
 //----------------------------------------------------------
 
 Vec2 Vec2::operator+(const Vec2 & rhs) const

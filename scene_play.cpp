@@ -22,6 +22,8 @@ ScenePlay::ScenePlay(GameEngine* eng, const std::string & lvlP)
 
     this->view = this->engine->getWindow()->getDefaultView();
     
+    this->entrances.reserve(10);
+    
     init();
 }
 
@@ -85,6 +87,11 @@ void ScenePlay::load_level()
                         tileY + (roomY * this->windowH) + bb.halfSize.y)
                     );
                     // std::cout << "pos: " << e->getComponent<CTransform>().pos.x << "," << e->getComponent<CTransform>().pos.y << "\n";
+                    
+                    if (animName == "Entrance")
+                    {
+                        this->entrances.emplace_back(Vec2(e->getComponent<CTransform>().pos));
+                    }
                 }
                 else
                 if (token == "Player")
@@ -486,7 +493,9 @@ void ScenePlay::sCollision()
         if (e->isAlive() == false)
             continue;
 
-        if (e->getComponent<CBoundingBox>().blocksMovement == 1)
+        auto& animName = e->getComponent<CAnimation>().getAnimation()->getName();
+        
+        if (e->getComponent<CBoundingBox>().blocksMovement == 1 || animName == "Entrance")
         {
             cVec.x = 0;
             cVec.y = 0;
@@ -494,8 +503,26 @@ void ScenePlay::sCollision()
             // collisions with player entity
             if (checkCollision(this->player, e, cVec))
             {
+                // std::cout << "Player colliding with " << animName << "\n";
+                
                 // resolve collision for player entity
-                this->player->getComponent<CTransform>().pos += cVec;
+                if (animName == "Entrance")
+                {
+                    while (true)
+                    {
+                        auto& newPos = this->entrances[ rand() % this->entrances.size() ];
+                        if (newPos == e->getComponent<CTransform>().pos)
+                            continue;
+                        
+                        this->player->getComponent<CTransform>().pos = newPos;
+                        this->player->getComponent<CTransform>().pos.y += e->getComponent<CBoundingBox>().size.y;
+                        this->player->getComponent<CTransform>().speed.x = 0;
+                        this->player->getComponent<CTransform>().speed.y = 0;
+                        break;
+                    }
+                }
+                else
+                    this->player->getComponent<CTransform>().pos += cVec;
             }
             
             // collisions with npc entities

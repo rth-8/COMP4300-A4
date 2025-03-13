@@ -6,6 +6,7 @@
 #include <SFML/Graphics/Text.hpp>
 
 #include "scene.h"
+#include "vector2d.h"
 
 class Entity;
 
@@ -30,6 +31,8 @@ class ScenePlay : public Scene
     PlayerConfig playerCfg;
     
     std::shared_ptr<Entity> sword = nullptr;
+    
+    std::vector<Vec2> entrances;
     
     void init();
     void load_level();
