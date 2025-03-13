@@ -197,30 +197,6 @@ void ScenePlay::sAnimation()
             anim->update(ac.frame++);
         else
             anim->update(currentFrame);
-        
-        if (e->hasComponent<CLifeSpan>())
-        {
-            if (e->getComponent<CLifeSpan>().frameCreated + e->getComponent<CLifeSpan>().lifespan == currentFrame)
-            {
-                e->kill();
-                
-                if (e == this->sword)
-                {
-                    this->sword = nullptr;
-                    if (this->player->getComponent<CState>().state == "attacking")
-                    {
-                        this->player->getComponent<CState>().state = this->player->getComponent<CState>().prev;
-                        this->player->getComponent<CState>().prev = "none";
-                        
-                        if (!waitingAction.empty())
-                        {
-                            startMoving(waitingAction);
-                            waitingAction.clear();
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -388,7 +364,38 @@ void ScenePlay::sMovement()
     {
         if (e->isAlive() == false)
             continue;
-
+        
+        if (e->hasComponent<CLifeSpan>())
+        {
+            if (e->getComponent<CLifeSpan>().frameCreated + e->getComponent<CLifeSpan>().lifespan == currentFrame)
+            {
+                e->kill();
+                
+                if (e == this->sword)
+                {
+                    this->sword = nullptr;
+                    if (this->player->getComponent<CState>().state == "attacking")
+                    {
+                        this->player->getComponent<CState>().state = this->player->getComponent<CState>().prev;
+                        this->player->getComponent<CState>().prev = "none";
+                        
+                        if (!waitingAction.empty())
+                        {
+                            startMoving(waitingAction);
+                            waitingAction.clear();
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (e->hasComponent<CInvincibility>())
+        {
+            e->getComponent<CInvincibility>().iFrames--;
+            if (e->getComponent<CInvincibility>().iFrames == 0)
+                e->removeComponent<CInvincibility>();
+        }
+        
         if (e == this->player)
         {
             if (this->player->getComponent<CState>().state == "attacking")
@@ -396,7 +403,6 @@ void ScenePlay::sMovement()
         }
         
         auto& trans = e->getComponent<CTransform>();
-        // auto& bb = e->getComponent<CBoundingBox>();
         
         // store previous position
         trans.prevPos = trans.pos;
@@ -503,19 +509,40 @@ void ScenePlay::sCollision()
             }
         }
     }
-    
-    if (this->sword != nullptr && this->sword->hasComponent<CDamage>())
+        
+    for (auto e : this->manager->getEntities("NPC"))
     {
-        for (auto e : this->manager->getEntities("NPC"))
+        if (this->player->hasComponent<CInvincibility>() == false)
+        {
+            if (checkCollision(e, this->player, cVec))
+            {
+                // npc hurts player
+                this->player->getComponent<CHealth>().current -= e->getComponent<CDamage>().damage;
+                
+                if (this->player->getComponent<CHealth>().current == 0)
+                {
+                    // player is dead
+                    // TODO
+                }
+                else
+                {
+                    this->player->addComponent<CInvincibility>(90);
+                }
+            }
+        }
+        
+        if (this->sword != nullptr && this->sword->hasComponent<CDamage>())
         {
             if (checkCollision(e, this->sword, cVec))
             {
+                // sword hits npc
                 this->engine->getAssets()->getSound("HurtSound").play();
-                e->getComponent<CHealth>().current -= 1;
+                e->getComponent<CHealth>().current -= this->sword->getComponent<CDamage>().damage;
                 this->sword->removeComponent<CDamage>();
                 
                 if (e->getComponent<CHealth>().current == 0)
                 {
+                    // if npc has no health left, then kill it
                     e->kill();
                     
                     // spawn explosion at same position
@@ -623,9 +650,21 @@ void ScenePlay::sRender()
         auto& spr = e->getComponent<CAnimation>().getAnimation()->getSprite();
         auto& t = e->getComponent<CTransform>();
 
-        spr.setPosition({t.pos.x, t.pos.y});
-        spr.setScale({t.scale.x, t.scale.y});
-        w->draw(spr);
+        if (e->hasComponent<CInvincibility>())
+        {
+            if (e->getComponent<CInvincibility>().iFrames % 6 == 0)
+            {
+                spr.setPosition({t.pos.x, t.pos.y});
+                spr.setScale({t.scale.x, t.scale.y});
+                w->draw(spr);
+            }
+        }
+        else
+        {
+            spr.setPosition({t.pos.x, t.pos.y});
+            spr.setScale({t.scale.x, t.scale.y});
+            w->draw(spr);
+        }
         
         if (e->hasComponent<CHealth>())
         {
