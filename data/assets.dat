@@ -48,3 +48,5 @@ Animation Entrance TexEntrance 1 0
 Animation Heart TexHeart 1 0
 Font MenuFont fonts/menu_font.ttf
 Sound HurtSound sounds/hurt.wav
+Sound SwordSlashSound sounds/sword_slash.wav
+Sound PickHeartSound sounds/pick_heart.wav

@@ -524,6 +524,8 @@ void ScenePlay::sCollision()
                 // player pick heart
                 if (animName == "Heart")
                 {
+                    this->engine->getAssets()->getSound("PickHeartSound").play();
+                    
                     tile->kill();
                     if (this->player->getComponent<CHealth>().current < this->player->getComponent<CHealth>().max)
                         this->player->getComponent<CHealth>().current += 1;
@@ -544,6 +546,8 @@ void ScenePlay::sCollision()
                     // npc picks heart
                     if (animName == "Heart")
                     {
+                        this->engine->getAssets()->getSound("PickHeartSound").play();
+                        
                         tile->kill();
                         if (npc->getComponent<CHealth>().current < npc->getComponent<CHealth>().max)
                             npc->getComponent<CHealth>().current += 1; 
@@ -905,6 +909,8 @@ void ScenePlay::sDoAction(const Action& action)
                 
                 this->sword->addComponent<CDamage>(1);
                 this->sword->addComponent<CLifeSpan>(20, currentFrame);
+                
+                this->engine->getAssets()->getSound("SwordSlashSound").play();
             }
         }
         else
