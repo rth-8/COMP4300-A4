@@ -21,6 +21,7 @@ Texture TexSwordDown gfx/sword1_d.png
 Texture TexSwordRight gfx/sword1_r.png
 Texture TexExplosion gfx/explosion.png
 Texture TexEntrance gfx/entrance.png
+Texture TexHeart gfx/heart1.png
 Animation Boulder TexBoulder 1 0
 Animation Bush TexBush 1 0
 Animation PlayerStandingUp TexPlayerStandingUp 1 0
@@ -44,5 +45,6 @@ Animation SwordDown TexSwordDown 1 0
 Animation SwordRight TexSwordRight 1 0
 Animation Explosion TexExplosion 8 5
 Animation Entrance TexEntrance 1 0
+Animation Heart TexHeart 1 0
 Font MenuFont fonts/menu_font.ttf
 Sound HurtSound sounds/hurt.wav

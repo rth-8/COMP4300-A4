@@ -488,67 +488,83 @@ void ScenePlay::sCollision()
 {
     Vec2 cVec;
     
-    for (auto e : this->manager->getEntities("Tile"))
+    for (auto tile : this->manager->getEntities("Tile"))
     {
-        if (e->isAlive() == false)
+        if (tile->isAlive() == false)
             continue;
 
-        auto& animName = e->getComponent<CAnimation>().getAnimation()->getName();
+        auto& animName = tile->getComponent<CAnimation>().getAnimation()->getName();
         
-        if (e->getComponent<CBoundingBox>().blocksMovement == 1 || animName == "Entrance")
+        if (tile->getComponent<CBoundingBox>().blocksMovement == 1)
         {
             cVec.x = 0;
             cVec.y = 0;
             
             // collisions with player entity
-            if (checkCollision(this->player, e, cVec))
+            if (checkCollision(this->player, tile, cVec))
             {
                 // std::cout << "Player colliding with " << animName << "\n";
                 
-                // resolve collision for player entity
                 if (animName == "Entrance")
                 {
                     while (true)
                     {
                         auto& newPos = this->entrances[ rand() % this->entrances.size() ];
-                        if (newPos == e->getComponent<CTransform>().pos)
+                        if (newPos == tile->getComponent<CTransform>().pos)
                             continue;
                         
                         this->player->getComponent<CTransform>().pos = newPos;
-                        this->player->getComponent<CTransform>().pos.y += e->getComponent<CBoundingBox>().size.y;
+                        this->player->getComponent<CTransform>().pos.y += tile->getComponent<CBoundingBox>().size.y;
                         this->player->getComponent<CTransform>().speed.x = 0;
                         this->player->getComponent<CTransform>().speed.y = 0;
                         break;
                     }
                 }
                 else
+                // player pick heart
+                if (animName == "Heart")
+                {
+                    tile->kill();
+                    if (this->player->getComponent<CHealth>().current < this->player->getComponent<CHealth>().max)
+                        this->player->getComponent<CHealth>().current += 1;
+                }
+                // resolve collision for player entity
+                else
                     this->player->getComponent<CTransform>().pos += cVec;
             }
             
             // collisions with npc entities
-            for (auto e2 : this->manager->getEntities("NPC"))
+            for (auto npc : this->manager->getEntities("NPC"))
             {
                 cVec.x = 0;
                 cVec.y = 0;
                 
-                if (checkCollision(e2, e, cVec))
+                if (checkCollision(npc, tile, cVec))
                 {
+                    // npc picks heart
+                    if (animName == "Heart")
+                    {
+                        tile->kill();
+                        if (npc->getComponent<CHealth>().current < npc->getComponent<CHealth>().max)
+                            npc->getComponent<CHealth>().current += 1; 
+                    }
                     // resolve collision for npc entity
-                    e2->getComponent<CTransform>().pos += cVec;
+                    else
+                        npc->getComponent<CTransform>().pos += cVec;
                 }
             }
         }
     }
-        
-    for (auto e : this->manager->getEntities("NPC"))
+
+    for (auto npc : this->manager->getEntities("NPC"))
     {
         if (this->player->hasComponent<CInvincibility>() == false)
         {
-            if (checkCollision(e, this->player, cVec))
+            if (checkCollision(npc, this->player, cVec))
             {
                 // npc hurts player
-                // std::cout << "DMG: " << e->getComponent<CDamage>().damage << "\n";
-                this->player->getComponent<CHealth>().current -= e->getComponent<CDamage>().damage;
+                // std::cout << "DMG: " << npc->getComponent<CDamage>().damage << "\n";
+                this->player->getComponent<CHealth>().current -= npc->getComponent<CDamage>().damage;
                 
                 if (this->player->getComponent<CHealth>().current == 0)
                 {
@@ -564,22 +580,22 @@ void ScenePlay::sCollision()
         
         if (this->sword != nullptr && this->sword->hasComponent<CDamage>())
         {
-            if (checkCollision(e, this->sword, cVec))
+            if (checkCollision(npc, this->sword, cVec))
             {
                 // sword hits npc
                 this->engine->getAssets()->getSound("HurtSound").play();
-                e->getComponent<CHealth>().current -= this->sword->getComponent<CDamage>().damage;
+                npc->getComponent<CHealth>().current -= this->sword->getComponent<CDamage>().damage;
                 this->sword->removeComponent<CDamage>();
                 
-                if (e->getComponent<CHealth>().current == 0)
+                if (npc->getComponent<CHealth>().current == 0)
                 {
                     // if npc has no health left, then kill it
-                    e->kill();
+                    npc->kill();
                     
                     // spawn explosion at same position
                     auto explosion = manager->addEntity("Explosion");
                     explosion->addComponent<CAnimation>(&this->engine->getAssets()->getAnimation("Explosion"), false);
-                    explosion->addComponent<CTransform>(Vec2(e->getComponent<CTransform>().pos.x, e->getComponent<CTransform>().pos.y));
+                    explosion->addComponent<CTransform>(Vec2(npc->getComponent<CTransform>().pos.x, npc->getComponent<CTransform>().pos.y));
                     explosion->addComponent<CLifeSpan>(explosion->getComponent<CAnimation>().getAnimation()->getDuration(), currentFrame);
                 }
             }
