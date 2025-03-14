@@ -24,6 +24,7 @@ class ScenePlay : public Scene
     int windowW2;
     int windowH;
     int windowH2;
+    bool followMode = false;
     
     std::string levelPath;
     

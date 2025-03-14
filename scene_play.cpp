@@ -45,6 +45,7 @@ void ScenePlay::init()
 
     registerAction(static_cast<int>(sf::Keyboard::Scancode::C), "TOGLEBB");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::T), "TOGLETEX");
+    registerAction(static_cast<int>(sf::Keyboard::Scancode::Y), "TOGLEFOLLOW");
 
     load_level();
 }
@@ -436,20 +437,27 @@ void ScenePlay::sMovement()
         trans.pos += trans.speed;
     }
     
-    // check, if player goes out of current view
-    // if so, then move view to new position
-    
-    if (this->player->getComponent<CTransform>().pos.x < (this->view.getCenter().x - windowW2))
-        this->view.setCenter(sf::Vector2f(this->view.getCenter().x - this->engine->getWindow()->getSize().x, this->view.getCenter().y));
+    if (this->followMode)
+    {
+        this->view.setCenter(sf::Vector2f(this->player->getComponent<CTransform>().pos.x, this->player->getComponent<CTransform>().pos.y));
+    }
+    else
+    {
+        // check, if player goes out of current view
+        // if so, then move view to new position
+        
+        if (this->player->getComponent<CTransform>().pos.x < (this->view.getCenter().x - windowW2))
+            this->view.setCenter(sf::Vector2f(this->view.getCenter().x - this->engine->getWindow()->getSize().x, this->view.getCenter().y));
 
-    if (this->player->getComponent<CTransform>().pos.x > (this->view.getCenter().x + windowW2))
-        this->view.setCenter(sf::Vector2f(this->view.getCenter().x + this->engine->getWindow()->getSize().x, this->view.getCenter().y));
-    
-    if (this->player->getComponent<CTransform>().pos.y < (this->view.getCenter().y - windowH2))
-        this->view.setCenter(sf::Vector2f(this->view.getCenter().x, this->view.getCenter().y - this->engine->getWindow()->getSize().y));
-    
-    if (this->player->getComponent<CTransform>().pos.y > (this->view.getCenter().y + windowH2))
-        this->view.setCenter(sf::Vector2f(this->view.getCenter().x, this->view.getCenter().y + this->engine->getWindow()->getSize().y));
+        if (this->player->getComponent<CTransform>().pos.x > (this->view.getCenter().x + windowW2))
+            this->view.setCenter(sf::Vector2f(this->view.getCenter().x + this->engine->getWindow()->getSize().x, this->view.getCenter().y));
+        
+        if (this->player->getComponent<CTransform>().pos.y < (this->view.getCenter().y - windowH2))
+            this->view.setCenter(sf::Vector2f(this->view.getCenter().x, this->view.getCenter().y - this->engine->getWindow()->getSize().y));
+        
+        if (this->player->getComponent<CTransform>().pos.y > (this->view.getCenter().y + windowH2))
+            this->view.setCenter(sf::Vector2f(this->view.getCenter().x, this->view.getCenter().y + this->engine->getWindow()->getSize().y));
+    }
 }
 
 void ScenePlay::sEnemySpawner()
@@ -940,6 +948,26 @@ void ScenePlay::sDoAction(const Action& action)
         if (action.name() == "TOGLETEX")
         {
             this->isDrawingTex = !this->isDrawingTex;
+        }
+        else
+        if (action.name() == "TOGLEFOLLOW")
+        {
+            this->followMode = !this->followMode;
+            if (this->followMode == false)
+            {
+                auto& t = this->player->getComponent<CTransform>();
+                int roomX, roomY;
+                if (t.pos.x < 0)
+                    roomX = (int)((t.pos.x / windowW) - 1);
+                else
+                    roomX = (int)(t.pos.x / windowW);
+                if (t.pos.y < 0)
+                    roomY = (int)((t.pos.y / windowH) - 1);
+                else
+                    roomY = (int)(t.pos.y / windowH);
+                
+                this->view.setCenter(sf::Vector2f(windowW2 + (windowW * roomX), windowH2 + (windowH * roomY)));
+            }
         }
     }
     else
