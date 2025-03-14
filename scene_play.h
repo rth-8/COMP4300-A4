@@ -38,7 +38,8 @@ class ScenePlay : public Scene
     void load_level();
     
     bool isPaused = false; 
-    bool isDrawingBB = false; 
+    bool isDrawingBB = false;
+    bool isDrawingTex = true;
     
     std::string waitingAction;
     void startMoving(std::string name);

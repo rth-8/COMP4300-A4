@@ -44,6 +44,7 @@ void ScenePlay::init()
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Space), "PLAYERATTACK");
 
     registerAction(static_cast<int>(sf::Keyboard::Scancode::C), "TOGLEBB");
+    registerAction(static_cast<int>(sf::Keyboard::Scancode::T), "TOGLETEX");
 
     load_level();
 }
@@ -184,10 +185,24 @@ void ScenePlay::update()
     if (this->isPaused == false)
     {
         currentFrame++;
+        
+        auto& t = this->player->getComponent<CTransform>();
+        int roomX, roomY;
+        if (t.pos.x < 0)
+            roomX = (int)((t.pos.x / windowW) - 1);
+        else
+            roomX = (int)(t.pos.x / windowW);
+        if (t.pos.y < 0)
+            roomY = (int)((t.pos.y / windowH) - 1);
+        else
+            roomY = (int)(t.pos.y / windowH);
+        
         this->engine->getWindow()->setTitle(
-            std::format("({},{}), frame: {}", 
+            std::format("({},{}) ~ [{},{}] ~ frame: {}", 
             this->player->getComponent<CTransform>().pos.x,
             this->player->getComponent<CTransform>().pos.y,
+            roomX,
+            roomY,
             currentFrame));
     }
 }
@@ -700,21 +715,24 @@ void ScenePlay::sRender()
         
         auto& spr = e->getComponent<CAnimation>().getAnimation()->getSprite();
         auto& t = e->getComponent<CTransform>();
-
-        if (e->hasComponent<CInvincibility>())
+        
+        if (this->isDrawingTex)
         {
-            if (e->getComponent<CInvincibility>().iFrames % 6 == 0)
+            if (e->hasComponent<CInvincibility>())
+            {
+                if (e->getComponent<CInvincibility>().iFrames % 6 == 0)
+                {
+                    spr.setPosition({t.pos.x, t.pos.y});
+                    spr.setScale({t.scale.x, t.scale.y});
+                    w->draw(spr);
+                }
+            }
+            else
             {
                 spr.setPosition({t.pos.x, t.pos.y});
                 spr.setScale({t.scale.x, t.scale.y});
                 w->draw(spr);
             }
-        }
-        else
-        {
-            spr.setPosition({t.pos.x, t.pos.y});
-            spr.setScale({t.scale.x, t.scale.y});
-            w->draw(spr);
         }
         
         if (e->hasComponent<CHealth>())
@@ -908,7 +926,7 @@ void ScenePlay::sDoAction(const Action& action)
                 }
                 
                 this->sword->addComponent<CDamage>(1);
-                this->sword->addComponent<CLifeSpan>(20, currentFrame);
+                this->sword->addComponent<CLifeSpan>(10, currentFrame);
                 
                 this->engine->getAssets()->getSound("SwordSlashSound").play();
             }
@@ -917,6 +935,11 @@ void ScenePlay::sDoAction(const Action& action)
         if (action.name() == "TOGLEBB")
         {
             this->isDrawingBB = !this->isDrawingBB;
+        }
+        else
+        if (action.name() == "TOGLETEX")
+        {
+            this->isDrawingTex = !this->isDrawingTex;
         }
     }
     else
