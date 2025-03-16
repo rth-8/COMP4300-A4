@@ -3,6 +3,7 @@
 #include "game_engine.h"
 #include "assets.h"
 #include "scene_play.h"
+#include "gamepad.h"
 
 SceneMenu::SceneMenu(GameEngine* eng) 
     : Scene(eng)
@@ -16,10 +17,14 @@ SceneMenu::SceneMenu(GameEngine* eng)
 void SceneMenu::init()
 {
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Escape), "ENDAPP");
+    registerAction(BUTTON_BACK, "ENDAPP");
     
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Up), "MENUUP");
+    registerAction(LEFT_STICK_U, "MENUUP");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Down), "MENUDOWN");
+    registerAction(LEFT_STICK_D, "MENUDOWN");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Enter), "MENUSELECT");
+    registerAction(BUTTON_A, "MENUSELECT");
     
     menuStrings.push_back("NOT ZELDA\n");
     menuStrings.push_back("Level 1\n");

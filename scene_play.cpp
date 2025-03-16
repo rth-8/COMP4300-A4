@@ -8,6 +8,7 @@
 #include "assets.h"
 #include "entity.h"
 #include "entity_manager.h"
+#include "gamepad.h"
 
 ScenePlay::ScenePlay(GameEngine* eng, const std::string & lvlP)
     : Scene(eng)
@@ -36,18 +37,19 @@ void ScenePlay::init()
 {
     // register actions
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Escape), "RETURNTOMENU");
+    registerAction(BUTTON_BACK, "RETURNTOMENU");
 
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Up), "PLAYERUP");
-    registerAction(6000, "PLAYERUP");
+    registerAction(LEFT_STICK_U, "PLAYERUP");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Down), "PLAYERDOWN");
-    registerAction(6001, "PLAYERDOWN");
+    registerAction(LEFT_STICK_D, "PLAYERDOWN");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Left), "PLAYERLEFT");
-    registerAction(6002, "PLAYERLEFT");
+    registerAction(LEFT_STICK_L, "PLAYERLEFT");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Right), "PLAYERRIGHT");
-    registerAction(6003, "PLAYERRIGHT");
+    registerAction(LEFT_STICK_R, "PLAYERRIGHT");
     
     registerAction(static_cast<int>(sf::Keyboard::Scancode::Space), "PLAYERATTACK");
-    registerAction(5002, "PLAYERATTACK");
+    registerAction(BUTTON_X, "PLAYERATTACK");
 
     registerAction(static_cast<int>(sf::Keyboard::Scancode::C), "TOGLEBB");
     registerAction(static_cast<int>(sf::Keyboard::Scancode::T), "TOGLETEX");
@@ -833,8 +835,8 @@ bool ScenePlay::isPlayerMoving()
 
 void ScenePlay::sDoAction(const Action& action)
 {
-    std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
-    std::cout << "waiting: " << waitingAction << "\n";
+    // std::cout << "SCENE PLAY: do action: " << action.name() << " (" << action.type() << ")\n";
+    // std::cout << "waiting: " << waitingAction << "\n";
 
     if (action.type() == "START")
     {

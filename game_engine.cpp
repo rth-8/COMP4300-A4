@@ -7,6 +7,7 @@
 #include "scene_menu.h"
 #include "scene_play.h"
 #include "action.h"
+#include "gamepad.h"
 
 GameEngine::GameEngine(std::shared_ptr<sf::RenderWindow> win)
     : window(win)
@@ -126,12 +127,6 @@ void GameEngine::quit()
     running = false;
 }
 
-#define DEADZONE 50.0f
-#define JU 6000
-#define JD 6001
-#define JL 6002
-#define JR 6003
-
 static bool joyUp = false;
 static bool joyDown = false;
 static bool joyLeft = false;
@@ -172,7 +167,7 @@ void GameEngine::sUserInput()
         
         if (joystickButtonPressed)
         {
-            int btn = static_cast<int>(joystickButtonPressed->button) + 5000;
+            int btn = static_cast<int>(joystickButtonPressed->button) + BUTTON_BASE;
             if (currentScene()->actionExists(btn))
             {
                 currentScene()->sDoAction(Action(currentScene()->getActionMap().at(btn), "START"));
@@ -181,7 +176,7 @@ void GameEngine::sUserInput()
         
         if (joystickButtonReleased)
         {
-            int btn = static_cast<int>(joystickButtonReleased->button) + 5000;
+            int btn = static_cast<int>(joystickButtonReleased->button) + BUTTON_BASE;
             if (currentScene()->actionExists(btn))
             {
                 currentScene()->sDoAction(Action(currentScene()->getActionMap().at(btn), "END"));
@@ -192,25 +187,25 @@ void GameEngine::sUserInput()
         {
             if (joystickMoved->axis == sf::Joystick::Axis::X)
             {
-                if (joystickMoved->position <= -DEADZONE || joystickMoved->position >= DEADZONE)
+                if (joystickMoved->position <= -LEFT_STICK_DEADZONE || joystickMoved->position >= LEFT_STICK_DEADZONE)
                 {
-                    if (joystickMoved->position <= -DEADZONE && !joyLeft)
+                    if (joystickMoved->position <= -LEFT_STICK_DEADZONE && !joyLeft)
                     {
-                        std::cout << "Joy LEFT START\n";
+                        // std::cout << "Joy LEFT START\n";
                         joyLeft = true;
-                        if (currentScene()->actionExists(JL))
+                        if (currentScene()->actionExists(LEFT_STICK_L))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JL), "START"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_L), "START"));
                         }
                     }
                     else
-                    if (joystickMoved->position >= DEADZONE && !joyRight)
+                    if (joystickMoved->position >= LEFT_STICK_DEADZONE && !joyRight)
                     {
-                        std::cout << "Joy RIGHT START\n";
+                        // std::cout << "Joy RIGHT START\n";
                         joyRight = true;
-                        if (currentScene()->actionExists(JR))
+                        if (currentScene()->actionExists(LEFT_STICK_R))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JR), "START"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_R), "START"));
                         }
                     }
                 }
@@ -218,46 +213,46 @@ void GameEngine::sUserInput()
                 {
                     if (joyLeft)
                     {
-                        std::cout << "Joy LEFT END\n";
+                        // std::cout << "Joy LEFT END\n";
                         joyLeft = false;
-                        if (currentScene()->actionExists(JL))
+                        if (currentScene()->actionExists(LEFT_STICK_L))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JL), "END"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_L), "END"));
                         }
                     }
                     else
                     if (joyRight)
                     {
-                        std::cout << "Joy RIGHT END\n";
+                        // std::cout << "Joy RIGHT END\n";
                         joyRight = false;
-                        if (currentScene()->actionExists(JR))
+                        if (currentScene()->actionExists(LEFT_STICK_R))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JR), "END"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_R), "END"));
                         }
                     }
                 }
             }
             if (joystickMoved->axis == sf::Joystick::Axis::Y)
             {
-                if (joystickMoved->position <= -DEADZONE || joystickMoved->position >= DEADZONE)
+                if (joystickMoved->position <= -LEFT_STICK_DEADZONE || joystickMoved->position >= LEFT_STICK_DEADZONE)
                 {
-                    if (joystickMoved->position <= -DEADZONE && !joyUp)
+                    if (joystickMoved->position <= -LEFT_STICK_DEADZONE && !joyUp)
                     {
-                        std::cout << "Joy UP START\n";
+                        // std::cout << "Joy UP START\n";
                         joyUp = true;
-                        if (currentScene()->actionExists(JU))
+                        if (currentScene()->actionExists(LEFT_STICK_U))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JU), "START"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_U), "START"));
                         }
                     }
                     else
-                    if (joystickMoved->position >= DEADZONE && !joyDown)
+                    if (joystickMoved->position >= LEFT_STICK_DEADZONE && !joyDown)
                     {
-                        std::cout << "Joy DOWN START\n";
+                        // std::cout << "Joy DOWN START\n";
                         joyDown = true;
-                        if (currentScene()->actionExists(JD))
+                        if (currentScene()->actionExists(LEFT_STICK_D))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JD), "START"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_D), "START"));
                         }
                     }
                 }
@@ -265,21 +260,21 @@ void GameEngine::sUserInput()
                 {
                     if (joyUp)
                     {
-                        std::cout << "Joy UP END\n";
+                        // std::cout << "Joy UP END\n";
                         joyUp = false;
-                        if (currentScene()->actionExists(JU))
+                        if (currentScene()->actionExists(LEFT_STICK_U))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JU), "END"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_U), "END"));
                         }
                     }
                     else
                     if (joyDown)
                     {
-                        std::cout << "Joy DOWN END\n";
+                        // std::cout << "Joy DOWN END\n";
                         joyDown = false;
-                        if (currentScene()->actionExists(JD))
+                        if (currentScene()->actionExists(LEFT_STICK_D))
                         {
-                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JD), "END"));
+                            currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_D), "END"));
                         }
                     }
                 }
@@ -289,38 +284,38 @@ void GameEngine::sUserInput()
         {
             if (joyUp)
             {
-                std::cout << "Joy UP END (2)\n";
+                // std::cout << "Joy UP END (2)\n";
                 joyUp = false;
-                if (currentScene()->actionExists(JU))
+                if (currentScene()->actionExists(LEFT_STICK_U))
                 {
-                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JU), "END"));
+                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_U), "END"));
                 }
             }
             if (joyDown)
             {
-                std::cout << "Joy DOWN END (2)\n";
+                // std::cout << "Joy DOWN END (2)\n";
                 joyDown = false;
-                if (currentScene()->actionExists(JD))
+                if (currentScene()->actionExists(LEFT_STICK_D))
                 {
-                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JD), "END"));
+                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_D), "END"));
                 }
             }
             if (joyLeft)
             {
-                std::cout << "Joy LEFT END (2)\n";
+                // std::cout << "Joy LEFT END (2)\n";
                 joyLeft = false;
-                if (currentScene()->actionExists(JL))
+                if (currentScene()->actionExists(LEFT_STICK_L))
                 {
-                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JL), "END"));
+                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_L), "END"));
                 }
             }
             if (joyRight)
             {
-                std::cout << "Joy RIGHT END (2)\n";
+                // std::cout << "Joy RIGHT END (2)\n";
                 joyRight = false;
-                if (currentScene()->actionExists(JR))
+                if (currentScene()->actionExists(LEFT_STICK_R))
                 {
-                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(JR), "END"));
+                    currentScene()->sDoAction(Action(currentScene()->getActionMap().at(LEFT_STICK_R), "END"));
                 }
             }
         }

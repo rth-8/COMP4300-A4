@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "entity_manager.h"
+// #include <iostream>
 
 Scene::Scene(GameEngine* eng) 
     : engine(eng)
@@ -10,6 +11,7 @@ Scene::Scene(GameEngine* eng)
 
 void Scene::registerAction(int key, const std::string& name)
 {
+    // std::cout << "Register action: " << key << " - " << name << "\n";
     this->actionMap[key] = name;
 }
 
